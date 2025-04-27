@@ -1,83 +1,165 @@
+// Специально для Павла: громатических ощибок англиского языка вы не найдете я все перепроверил
+// пс зато руских хватит
+
+const categories = [
+    "Jackets & Coats",
+    "Hoodies",
+    "T-shirts & Vests",
+    "Shirts",
+    "Blazers & Suits",
+    "Jeans",
+    "Trousers",
+    "Shorts",
+    "Underwear",
+    "Gift Sets"
+];
+  
+const products = [
+    { name: "Slub Jersey T-shirt", price: "$12.99", image: "assets/Product image.png" },
+    { name: "Printed T-shirt", price: "$12.99", image: "assets/Product image(1).png" },
+    { name: "Cotton T-shirt", price: "$12.99", image: "assets/Product image(2).png" },
+    { name: "T-shirt with a motif", price: "$12.99", image: "assets/Product image(3).png" },
+    { name: "Cotton T-shirt Regular Fit", price: "$12.99", image: "assets/Product image(4).png" },
+    { name: "Slub Jersey T-shirt", price: "$12.99", image: "assets/Product image(5).png" },
+];
+
+
+const options = [
+    { value: 'recommended', text: 'RECOMENDED' },
+    { value: 'priceAsc', text: 'COST ↑' },
+    { value: 'priceDesc', text: 'COST ↓' },
+    { value: 'newest', text: 'NEW' }
+];
+
+
+
 const app = document.getElementById('app');
 
-const mainCont = document.createElement('div');
-mainCont.className = 'main-container';
-app.appendChild(mainCont);
+// тут я придумал как можно не писать каждый раз element.className = ''
 
-const titelDiv = document.createElement('div');
-titelDiv.className = 'titel-container';
-mainCont.appendChild(titelDiv);  
+const createElementWithClass = (tag, ...classes) => {
+    const el = document.createElement(tag);
+    el.classList.add(...classes);
+    return el;
+}
 
-const title = document.createElement('h1');
-title.textContent = 'Last works';
-titelDiv.appendChild(title);
 
-const exploreButton = document.createElement('button');
-exploreButton.textContent = 'Explore Showcase';
-exploreButton.className = 'top-btn';
-titelDiv.appendChild(exploreButton);
+const createSidebar = (categories) => {
 
-const container = document.createElement('div');
-container.className = 'container';
-mainCont.appendChild(container);
+    const sidebar = createElementWithClass('div', 'sidebar');
+  
+    const nav = document.createElement('nav');
+  
+    categories.forEach(category => {
+    const categoryDiv = document.createElement('div');
+    categoryDiv.textContent = category;
+  
+    categoryDiv.addEventListener('click', () => {
 
-function createCard({ title, text, btnClass = 'white', className = '' }) {
-    const card = document.createElement('div');
-    card.className = `card ${className}`;
+        nav.querySelectorAll('div').forEach(div => div.classList.remove('active'));
+        categoryDiv.classList.add('active');
+    });
+  
+    nav.appendChild(categoryDiv);
+    });
+  
+    sidebar.appendChild(nav);
+    return sidebar;
+}
+  
 
-    const classes = className.split(' ');
+const createProductsHeader = () => {
+    const header = createElementWithClass('div', 'products-header');
+  
+    const itemCount = createElementWithClass('div', 'item-count');
+    itemCount.textContent = `${products.length} ITEMS`;
+  
+    const sortDropdown = createElementWithClass('div', 'sort-dropdown');
+    const sortLabel = createElementWithClass('span', 'sort-label');
+    sortLabel.textContent = "SORT BY:";
+  
+    const dropdown = createElementWithClass('select', 'sort-dropdown');
+    
+    options.forEach(option => {
+        const opt = document.createElement('option');
+        opt.value = option.value;
+        opt.textContent = option.text;
+        dropdown.appendChild(opt);
+    });
+  
+    // это задел на будущие 
+    dropdown.addEventListener('change', (event) => {
+        sortProducts(event.target.value); 
+    });
+  
+    sortDropdown.appendChild(sortLabel);
+    sortDropdown.appendChild(dropdown);
+  
+    header.appendChild(itemCount);
+    header.appendChild(sortDropdown);
+  
+    return header;
+};
+  
 
-    if (classes.includes('image')) {
-        const imageName = classes.find(cls => cls !== 'image');
-        if (imageName) {
-            card.style.backgroundImage = `url('assets/Image_${imageName}.png')`;
-            card.style.backgroundSize = 'cover';
-            card.style.backgroundPosition = 'center';
-            card.style.color = 'white';
-        }
-    }
+const createProductCard = (product) => {
+    const card = createElementWithClass('div', 'product-card');
 
-    const h2 = document.createElement('h2');
-    h2.textContent = title;
+    const imageWrapper = createElementWithClass('div', 'product-image');
+    const img = document.createElement('img');
+    img.src = product.image;
+    img.alt = product.name;
+    imageWrapper.appendChild(img);
 
-    const p = document.createElement('p');
-    p.textContent = text;
+    const title = createElementWithClass('h3', 'product-title');
+    title.textContent = product.name;
 
-    const btn = document.createElement('button');
-    btn.textContent = 'Explore';
-    btn.className = btnClass;
+    const price = createElementWithClass('p', 'product-price');
+    price.textContent = product.price;
 
-    card.appendChild(h2);
-    card.appendChild(p);
-    card.appendChild(btn);
+    const button = createElementWithClass('button', 'add-to-bag');
+    button.textContent = "Add to bag";
+
+    card.appendChild(imageWrapper);
+    card.appendChild(title);
+    card.appendChild(price);
+    card.appendChild(button);
 
     return card;
 }
 
-const cardsData = [
-    {
-        title: 'Startup Framework',
-        text: 'Startup is a powerful tool for quick and convenient proto-typing of your projects. It will fit most projects because it contains up-to-date and modern web elements.',
-        className: 'grey',
-    },
-    {
-        title: 'Web Generator',
-        text: 'Startup is a powerful tool for quick and convenient proto-typing of your projects. It will fit most projects because it contains up-to-date and modern web elements.',
-        btnClass: 'mint',
-    },
-    {
-        title: 'Slides 4',
-        text: 'All of these components are made in the same style, and can easily be integrated into projects, allowing you to create hundreds of solutions for your future projects.',
-        className: 'blue',
-    },
-    {
-        title: 'Postcards',
-        text: 'All frequently used elements are now in symbols. Use them to create interfaces really fast. Easily change icons, colors and text. Add new symbols to customize your design.',
-        className: 'image first',
-    }
-];
+const createProductsGrid = () => {
+    const grid = createElementWithClass('div', 'products-grid');
+    products.forEach(product => {
+        grid.appendChild(createProductCard(product));
+    });
+    return grid;
+}
 
-cardsData.forEach(data => {
-    const card = createCard(data);
-    container.appendChild(card);
-});
+const createPage = () => {
+
+    const container = createElementWithClass('div', 'container');
+    const contentWrapper = createElementWithClass('div', 'content-wrapper');
+    const sidebar = createSidebar(categories);
+
+    const mainContent = createElementWithClass('div', 'main-content');
+    const header = createProductsHeader();
+    const grid = createProductsGrid();
+
+    mainContent.appendChild(header);
+    mainContent.appendChild(grid);
+
+    contentWrapper.appendChild(sidebar);
+    contentWrapper.appendChild(mainContent);
+
+    container.appendChild(contentWrapper);
+    app.appendChild(container);
+}
+
+createPage();
+
+
+
+
+
+
